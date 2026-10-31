@@ -9,7 +9,9 @@
 ## 0. Bối cảnh chuyến đi đầu tiên (ưu tiên cao nhất, ghi đè các mục bên dưới nếu mâu thuẫn)
 
 - **Máy:** iPhone. **Người chụp:** người đi cùng. **Kiểu ảnh:** 1 người + cặp đôi.
-- **Điểm đến:** Thành Đô & Trùng Khánh (Trung Quốc), tháng 11–12.
+- **Điểm đến:** Thành Đô & Trùng Khánh (Trung Quốc), tháng 11–12. Còn nhiều thời gian trước khi bay.
+- **Đã chốt:** chỉ làm web app (PWA), **không làm app iPhone native**. Ảnh thật chụp bằng **Camera gốc của iPhone**, rồi upload lên app.
+- **Mạng:** mua eSIM Trung Quốc.
 
 ### 0.1 Đi Trung Quốc ảnh hưởng gì
 | Vấn đề | Hệ quả | Cách xử lý |
@@ -18,7 +20,7 @@
 | Model MediaPipe tải từ CDN Google | Không tải được ở TQ | Tự host file `.wasm` + `.task` cùng app, precache bằng service worker |
 | Font/CDN bên ngoài | Lỗi/treo | Không dùng Google Fonts / CDN; bundle tất cả |
 | iOS xoá cache web | Mất dữ liệu | **Bắt buộc "Add to Home Screen"**; app cài trên màn hình chính không bị iOS xoá storage sau 7 ngày |
-| eSIM roaming quốc tế | Dữ liệu đi qua gateway nước ngoài nên thường vẫn gọi được API | Coi là “có thì tốt”, app không phụ thuộc |
+| eSIM Trung Quốc | eSIM du lịch bán cho khách nước ngoài thường đi qua Hong Kong nên vẫn vào được Google/Claude; eSIM của nhà mạng nội địa TQ thì bị chặn | Hỏi người bán: "có vào được Google/Facebook không?". Có → dùng AI tại chỗ. Không → vẫn chạy offline |
 
 → Phân tích cảnh bằng AI chuyển sang làm **trước chuyến đi**: cho AI phân tích ảnh tham khảo của từng địa điểm, rồi lưu sẵn kết quả + dáng vào máy.
 
@@ -33,22 +35,40 @@
 
 Mỗi địa điểm: ~10–20 dáng (1 người + cặp đôi), mẹo góc máy, giờ đẹp. Đi tháng 11–12 thường trời âm u/sương, ánh sáng dịu, mặc áo khoác.
 
-### 0.4 iPhone + ảnh đêm: điểm quyết định PWA hay native
-- Camera qua web trên iPhone **không có Night mode, Smart HDR, Deep Fusion**. Trùng Khánh nổi tiếng chụp đêm (Hồng Nhai Động, đèn neon), nên đây là rủi ro lớn nhất.
-- Giai đoạn 0 sẽ chụp thử ban ngày **và** ban đêm trên chính iPhone của bạn, so với camera gốc.
-- Nếu không đạt thì làm app native iOS (Expo + `react-native-vision-camera`, giữ lại logic TypeScript). Cần một trong hai:
-  - Có máy Mac (Xcode, dùng Apple ID miễn phí, nhưng **phải ký lại app mỗi 7 ngày**, bất tiện nếu chuyến đi dài hơn 7 ngày), hoặc
-  - Apple Developer $99/năm (cài qua TestFlight, không cần Mac nếu build bằng EAS).
-- Phương án dự phòng khi vẫn dùng PWA: chế độ "Xem mẫu" (người chụp xem dáng + viền, rồi chụp đêm bằng camera gốc).
+### 0.4 Luồng chụp chính: Camera gốc + upload (giữ Night mode, Portrait, chất lượng gốc)
 
-### 0.5 Thứ tự ưu tiên mới cho chuyến này
-1. **Giai đoạn 0:** spike chụp thử ngày/đêm trên iPhone, chốt PWA hay native.
-2. **Overlay + chế độ người chụp hộ** (người đi cùng là người cầm máy): viền to, mẹo góc máy 1 dòng, nút chụp to.
-3. **Thư viện + import từ 小红书** (crop, tag `1 người` / `cặp đôi`, tag theo địa điểm).
-4. **Chế độ chuyến đi Thành Đô – Trùng Khánh, offline hoàn toàn** (danh sách địa điểm ở 0.3).
-5. **Cặp đôi:** viền 2 người; khi cả hai cùng vào hình thì đặt tripod + hẹn giờ + tự chụp khi cả 2 khớp dáng (`numPoses: 2`).
-6. **AI phân tích cảnh:** chạy ở nhà trước chuyến đi; tại chỗ chỉ dùng khi có eSIM roaming.
-- Hoãn: tìm địa danh qua GPS/Overpass, Unsplash/Pexels.
+```
+① Chọn cảnh ──► ② Chọn dáng ──► ③ Thẻ hướng dẫn ──► ④ Chụp bằng Camera gốc ──► ⑤ Upload để chấm ──► chụp lại / xong
+```
+
+1. **Chọn cảnh:** chọn địa điểm trong danh sách soạn sẵn, **hoặc** chụp khung cảnh bằng Camera gốc rồi upload. AI gợi ý dáng (cần mạng); offline thì lọc theo tag.
+   - Nếu ảnh còn giữ GPS (EXIF) thì tự nhận ra đang ở địa điểm nào trong danh sách. Lưu ý iOS hay xoá vị trí khi chọn ảnh từ web; khi chọn ảnh bấm "Options → bật Location".
+2. **Chọn dáng:** lọc theo `1 người` / `cặp đôi`, theo địa điểm, yêu thích.
+3. **Thẻ hướng dẫn** (màn hình cho người đi cùng xem trước khi bấm máy):
+   - Ảnh mẫu + viền dáng, mẫu và viền xếp cạnh nhau hoặc đè lên nhau.
+   - **Cho người chụp:** ống kính (0.5x / 1x / 2x / 3x), độ cao máy (ngang mắt / ngực / hông / sát đất), dọc hay ngang, vị trí người trong khung (1/3 trái…), khoảng cách.
+   - **Cho người tạo dáng:** 2–3 gạch đầu dòng ("tay trái chạm mũ", "nhìn ra xa, không nhìn máy").
+4. **Chụp bằng Camera gốc** (Night mode cho Hồng Nhai Động, Portrait…).
+5. **Upload ảnh vừa chụp để chấm:**
+   - Offline: MediaPipe so khung xương với dáng mẫu → điểm 0–100, ảnh đè viền mẫu lên ảnh thật, chỉ ra khớp nào lệch.
+   - Có mạng: thêm nhận xét của Claude (so 2 ảnh): sửa dáng, bố cục, ánh sáng, bằng tiếng Việt.
+   - Nút "Chụp lại", hoặc lưu ảnh vào nhật ký chuyến đi.
+
+**Tính năng phụ (thử nghiệm ở Giai đoạn 0):**
+- **Cửa sổ mẫu nổi (Picture-in-Picture):** vẽ dáng mẫu thành video, bật PiP, rồi mở Camera gốc. Nếu iOS cho phép cửa sổ PiP nổi trên Camera, người chụp vừa nhìn mẫu vừa chụp. Không được thì bỏ.
+- **Căn khung trực tiếp trong app:** viền đè lên camera web, chỉ để xem trước và căn khung (chất lượng ảnh thấp hơn, không có Night mode).
+
+Kỹ thuật upload: `<input type="file" accept="image/*">`; iOS tự chuyển ảnh HEIC sang JPEG khi upload. Ảnh resize trên máy trước khi phân tích/gửi AI.
+
+### 0.5 Thứ tự ưu tiên cho chuyến này
+1. **Nền móng:** PWA cài lên màn hình chính, chạy offline, tự host model MediaPipe; test PiP.
+2. **Thư viện + import từ 小红书:** crop, tách viền, tag `1 người` / `cặp đôi`, tag theo địa điểm.
+3. **Thẻ hướng dẫn** cho người chụp + người tạo dáng.
+4. **Upload ảnh đã chụp → chấm điểm + đè viền** (offline), hỗ trợ 2 người (`numPoses: 2`).
+5. **Chế độ chuyến đi Thành Đô – Trùng Khánh:** địa điểm soạn sẵn, dáng tải sẵn.
+6. **AI:** phân tích cảnh từ ảnh upload, nhận xét ảnh đã chụp, tự gắn tag khi import.
+7. (Phụ) Căn khung trực tiếp trong app, cửa sổ mẫu PiP.
+- Hoãn: tìm địa danh qua GPS/Overpass, Unsplash/Pexels, tự chụp khi khớp dáng.
 
 ---
 
@@ -71,6 +91,8 @@ Bản cá nhân của mình sẽ làm đủ những thứ trên, **cộng thêm*
 ---
 
 ## 2. Quyết định nền tảng: PWA (web app) trước, native sau nếu cần
+
+> **Đã chốt (xem mục 0):** chỉ PWA, không làm native. Chụp bằng Camera gốc rồi upload, nên phần "chất lượng ảnh iPhone" bên dưới không còn là rủi ro.
 
 | | PWA (khuyến nghị) | Native (Expo / React Native) |
 |---|---|---|
@@ -213,16 +235,19 @@ camera-wizard/
 
 | Giai đoạn | Nội dung | Ước lượng | Dùng được khi xong? |
 |---|---|---|---|
-| 0. Spike | Khung Vite/React/PWA, mở camera, chụp thử, **đo chất lượng ảnh trên máy bạn**, deploy lên Pages | 0.5 ngày | — |
-| 1. MVP overlay | Import 1 ảnh mẫu → tách viền → đè lên camera (kéo/pinch/mờ/lật) → chụp, hẹn giờ, lưu | 2–3 ngày | ✅ Đủ dùng cho chuyến đi |
-| 2. Thư viện dáng | Import hàng loạt, tag, lọc, yêu thích, fallback skeleton | 2 ngày | ✅ |
-| 3. Gợi ý AI | Worker + Claude phân tích cảnh/text, Unsplash/Pexels, xếp hạng, mẹo chụp | 2–3 ngày | ✅ Ngang SnapPose |
-| 4. Khớp dáng | Pose realtime, chấm điểm, đổi màu viền, tự chụp | 2–3 ngày | ✅ Hơn SnapPose |
-| 5. Địa danh + Offline | GPS + Overpass, chế độ chuyến đi, prefetch, cache model | 2 ngày | ✅ |
-| 6. Hoàn thiện | Chế độ người chụp hộ, test ngoài đường thật, sửa lỗi hiệu năng | 1–2 ngày | ✅ |
-| 7. (Tuỳ chọn) Native | Port camera sang Expo nếu ảnh iPhone qua web không đạt | 3–5 ngày | — |
+> Bảng này đã được cập nhật theo mục 0 (chụp bằng Camera gốc + upload).
 
-**Tổng: ~2–3 tuần part-time.** Nếu chuyến đi gần, làm xong Giai đoạn 1–2 là đã mang đi dùng được.
+| Giai đoạn | Nội dung | Ước lượng | Dùng được khi xong? |
+|---|---|---|---|
+| 0. Nền móng | Vite/React/PWA, cài lên màn hình chính, chạy offline, tự host model MediaPipe, deploy; thử PiP | 1 ngày | — |
+| 1. Thư viện dáng | Import ảnh (screenshot 小红书), crop, tách viền, khung xương, tag 1 người/cặp đôi/địa điểm, fallback skeleton | 2–3 ngày | ✅ Xem mẫu được |
+| 2. Thẻ hướng dẫn | Mẫu + viền, hướng dẫn cho người chụp (ống kính, độ cao, bố cục) và người tạo dáng | 1–2 ngày | ✅ Đủ dùng cho chuyến đi |
+| 3. Chấm ảnh đã chụp | Upload ảnh từ Camera gốc → so khung xương (1–2 người) → điểm, đè viền, chỉ khớp lệch | 2–3 ngày | ✅ Hơn SnapPose |
+| 4. Chuyến đi | Địa điểm Thành Đô/Trùng Khánh soạn sẵn, gom dáng theo địa điểm, đọc GPS từ ảnh, nhật ký ảnh | 1–2 ngày | ✅ |
+| 5. AI | Worker + Claude: phân tích ảnh cảnh, nhận xét ảnh đã chụp, tự gắn tag khi import | 2–3 ngày | ✅ |
+| 6. Phụ + hoàn thiện | Căn khung trực tiếp trong app, cửa sổ PiP (nếu iOS cho), test ngoài đường thật | 2 ngày | ✅ |
+
+**Tổng: ~2–3 tuần part-time.** Bay còn lâu nên làm đủ cả 6 giai đoạn, và có thời gian đi chụp thử ở Việt Nam trước.
 
 ---
 
@@ -255,10 +280,8 @@ camera-wizard/
 
 ## 10. Cần bạn chốt trước khi code
 
-Đã chốt: iPhone · người đi cùng chụp · Thành Đô & Trùng Khánh tháng 11–12 · 1 người + cặp đôi.
+Đã chốt: iPhone · người đi cùng chụp · Thành Đô & Trùng Khánh tháng 11–12, còn lâu mới bay · 1 người + cặp đôi · chỉ PWA, chụp bằng Camera gốc rồi upload · eSIM Trung Quốc.
 
-Còn lại:
-1. **Ngày bay cụ thể?** Từ đó cắt scope: < 2 tuần thì chỉ làm mục 1–4 ở 0.5.
-2. Có **máy Mac** không? Có sẵn sàng trả **$99 Apple Developer** nếu phải làm native không?
-3. Có mua **eSIM roaming** quốc tế không? (quyết định có dùng AI tại chỗ được hay không)
-4. OK với chi phí Claude API khoảng vài USD (phân tích trước chuyến) không?
+Cần chuẩn bị khi tới Giai đoạn 0 và Giai đoạn 5:
+1. Tài khoản **Cloudflare** (miễn phí) để host app + Worker.
+2. **API key Anthropic** (Claude) để dùng phần AI. Chi phí khoảng vài USD mỗi chuyến.
