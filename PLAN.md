@@ -60,7 +60,7 @@ Khối lượng: ~15 địa điểm × 10–20 dáng ≈ 150–300 ảnh, khoả
 
 ### 0.3 Danh sách địa điểm soạn sẵn (thay cho tính năng GPS)
 **Thành Đô:** Khoan Trách hạng tử (宽窄巷子), Cẩm Lý (锦里), Vũ Hầu Từ (武侯祠), Xuân Hy Lộ/Thái Cổ Lý (春熙路/太古里) + gấu trúc leo tòa IFS, Văn Thù Viện (文殊院), Cơ sở gấu trúc (熊猫基地), cầu An Thuận về đêm (安顺廊桥), Nhân Dân Công Viên quán trà (人民公园), Đô Giang Yển / Thanh Thành Sơn.
-**Trùng Khánh:** Hồng Nhai Động về đêm (洪崖洞), ga monorail xuyên nhà Lý Tử Bá (李子坝), Giải Phóng Bi (解放碑), cáp treo sông Trường Giang (长江索道), Từ Khí Khẩu (磁器口), Thập Bát Thê (十八梯), công viên Nga Lĩnh / Nhị Hán (鹅岭二厂), Khôi Tinh Lâu (魁星楼), Triều Thiên Môn / Lai Phúc Sĩ (朝天门/来福士).
+**Trùng Khánh:** Hồng Nhai Động về đêm (洪崖洞), ga monorail xuyên nhà Lý Tử Bá (李子坝), Giải Phóng Bi (解放碑), cáp treo sông Trường Giang (长江索道), Từ Khí Khẩu (磁器口), Thập Bát Thê (十八梯), Nga Lĩnh Nhị Xưởng (鹅岭二厂), Khôi Tinh Lâu (魁星楼), Triều Thiên Môn / Lai Phúc Sĩ (朝天门/来福士).
 
 Mỗi địa điểm: ~10–20 dáng (1 người + cặp đôi), mẹo góc máy, giờ đẹp. Đi tháng 11–12 thường trời âm u/sương, ánh sáng dịu, mặc áo khoác.
 
@@ -102,6 +102,23 @@ Kỹ thuật upload: `<input type="file" accept="image/*">`; iOS tự chuyển �
 6. **AI:** phân tích cảnh từ ảnh upload, nhận xét ảnh đã chụp, tự gắn tag khi import.
 7. (Phụ) Căn khung trực tiếp trong app, cửa sổ mẫu PiP.
 - Hoãn: tìm địa danh qua GPS/Overpass, Unsplash/Pexels, tự chụp khi khớp dáng.
+
+---
+
+## Tiến độ
+
+| Giai đoạn | Trạng thái |
+|---|---|
+| 0. Nền móng (PWA, offline, tự host AI) | ✅ Xong |
+| 1. Thư viện dáng (import, crop, tách viền, số liệu viral, tag, địa điểm) | ✅ Xong |
+| Gợi ý theo ảnh khung cảnh (so phông nền, offline) | ✅ Bản đầu |
+| 2. Thẻ hướng dẫn cho người chụp + người tạo dáng | ⏳ Tiếp theo |
+| 3. Upload ảnh đã chụp → chấm điểm khớp dáng | ⏳ |
+| 4. Chuyến đi, đọc GPS từ ảnh, nhật ký | ⏳ |
+| 5. AI (Claude): đọc số liệu từ screenshot, tự gắn tag | ⏳ |
+| 6. Import video (trích khung hình), sao lưu thư viện ra file, PiP | ⏳ |
+
+Code ở `apps/web` (xem `apps/web/README.md` để chạy, deploy, cài lên iPhone).
 
 ---
 
