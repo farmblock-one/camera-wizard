@@ -70,7 +70,11 @@ Mỗi địa điểm: ~10–20 dáng (1 người + cặp đôi), mẹo góc máy
 ① Chọn cảnh ──► ② Chọn dáng ──► ③ Thẻ hướng dẫn ──► ④ Chụp bằng Camera gốc ──► ⑤ Upload để chấm ──► chụp lại / xong
 ```
 
-1. **Chọn cảnh:** chọn địa điểm trong danh sách soạn sẵn, **hoặc** chụp khung cảnh bằng Camera gốc rồi upload. AI gợi ý dáng (cần mạng); offline thì lọc theo tag.
+1. **Chọn cảnh:** chọn địa điểm trong danh sách soạn sẵn, **hoặc** chụp khung cảnh bằng Camera gốc rồi upload. App gợi ý dáng từ **thư viện của bạn**:
+   - **Offline (chính):** MediaPipe `ImageEmbedder` chạy trên máy, tạo "dấu vân tay" hình ảnh cho ảnh cảnh và cho phông nền của từng ảnh mẫu (đã tính sẵn lúc import) → tìm ảnh mẫu có **khung cảnh giống nhất** (cùng địa điểm, cùng góc) → xếp hạng theo **độ giống cảnh × điểm viral**, lọc 1 người / cặp đôi.
+   - Cộng thêm GPS trong ảnh (nếu có) để ưu tiên dáng của địa điểm gần nhất.
+   - Có mạng thì thêm gợi ý của AI (Claude).
+   - Gặp chỗ chưa chuẩn bị trước: vẫn tìm được ảnh mẫu có cảnh *trông giống* (cầu thang, tường cổ, phố đêm…). Nên chuẩn bị thêm một bộ **dáng chung** (đường phố, cầu thang, lan can, quán cà phê, phố đêm neon).
    - Nếu ảnh còn giữ GPS (EXIF) thì tự nhận ra đang ở địa điểm nào trong danh sách. Lưu ý iOS hay xoá vị trí khi chọn ảnh từ web; khi chọn ảnh bấm "Options → bật Location".
 2. **Chọn dáng:** lọc theo `1 người` / `cặp đôi`, theo địa điểm, yêu thích.
 3. **Thẻ hướng dẫn** (màn hình cho người đi cùng xem trước khi bấm máy):
