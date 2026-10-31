@@ -21,13 +21,42 @@
 | Font/CDN bên ngoài | Lỗi/treo | Không dùng Google Fonts / CDN; bundle tất cả |
 | iOS xoá cache web | Mất dữ liệu | **Bắt buộc "Add to Home Screen"**; app cài trên màn hình chính không bị iOS xoá storage sau 7 ngày |
 | eSIM Trung Quốc | eSIM du lịch bán cho khách nước ngoài thường đi qua Hong Kong nên vẫn vào được Google/Claude; eSIM của nhà mạng nội địa TQ thì bị chặn | Hỏi người bán: "có vào được Google/Facebook không?". Có → dùng AI tại chỗ. Không → vẫn chạy offline |
+| VPN | Về kỹ thuật thì dùng được. Nhưng: VPN không được cấp phép là trái quy định ở TQ (ít khi xử lý khách du lịch); nhiều VPN bị chặn hoặc chập chờn; App Store vùng TQ không có app VPN nên phải cài và test trước khi đi | Không cần cho phần chính, vì phần chính chạy offline. Chỉ ảnh hưởng phần AI tại chỗ |
+| Khu vực Anthropic hỗ trợ | Trung Quốc đại lục không nằm trong danh sách khu vực Claude hỗ trợ | Thiết kế để phần AI (đọc số liệu, gắn tag, phân tích địa điểm) **làm xong ở Việt Nam trước khi bay**. Trong chuyến chỉ cần các tính năng offline |
 
 → Phân tích cảnh bằng AI chuyển sang làm **trước chuyến đi**: cho AI phân tích ảnh tham khảo của từng địa điểm, rồi lưu sẵn kết quả + dáng vào máy.
 
-### 0.2 Nguồn dáng tốt nhất cho Thành Đô/Trùng Khánh: Xiaohongshu (小红书)
-- Ảnh "打卡" (check-in) tại đúng các điểm này nhiều hơn Unsplash rất nhiều.
-- Luồng: chụp màn hình bài 小红书 → import vào app → **công cụ crop** (bỏ UI/chữ) → tách viền tự động.
-- Unsplash/Pexels hạ xuống nguồn phụ.
+### 0.2 Nguồn dáng: mạng xã hội, ưu tiên bài viral
+
+**Nguồn:** Xiaohongshu (小红书), Douyin (抖音), TikTok, Instagram. Unsplash/Pexels chỉ là nguồn phụ.
+
+**Vì sao bạn tự lướt, app không tự cào:** các nền tảng này không có API công khai, chặn bot, cần đăng nhập, và cấm cào trong điều khoản. iOS cũng không cho web app nhận "Chia sẻ" từ app khác. Vì vậy:
+**bạn lướt và lọc bài hot → chụp màn hình (hoặc quay màn hình video) → import hàng loạt vào app → app tự làm phần còn lại.**
+
+**Bạn lọc độ viral khi lướt:**
+| Nền tảng | Cách tìm | Ngưỡng gợi ý ban đầu (chỉnh dần) |
+|---|---|---|
+| 小红书 | Gõ từ khoá → sắp xếp **最热** (hot nhất) | 收藏 (lưu) ≥ 1.000 |
+| 抖音 | Gõ từ khoá → bộ lọc **最多点赞** (nhiều like nhất) | 点赞 ≥ 10.000 |
+| TikTok | Tìm từ khoá tiếng Anh, xem tab Top | ≥ 10.000 like |
+| Instagram | Hashtag/địa điểm → bài Top | ≥ 1.000 like |
+
+Chụp màn hình **cả phần hiện số like/lưu/bình luận** để app đọc được.
+
+**App xử lý khi import:**
+1. **Đọc số liệu từ screenshot** (Claude đọc ảnh, cần mạng nên làm ở Việt Nam): nền tảng, like, lưu, bình luận, chia sẻ (hiểu cả "1.2万" = 12.000), tag địa điểm, caption, ngày đăng, số người trong ảnh. Không có mạng thì nhập tay.
+2. **Điểm viral** = log₁₀(1 + like + 3×lưu + 2×bình luận + 2×chia sẻ), quy về **phần trăm xếp hạng trong cùng nền tảng** (vì quy mô Douyin khác hẳn Instagram), cộng điểm nếu đăng trong 12 tháng gần nhất (địa điểm hay thay đổi). Lượt **lưu** được nhân cao vì người ta lưu bài để bắt chước dáng.
+3. **Crop** bỏ giao diện app, chữ, sticker → tách viền + khung xương.
+4. **Video (抖音/TikTok):** upload bản quay màn hình → app tự trích các khung hình có người rõ và đứng yên → bạn chọn khung đẹp nhất.
+5. Gợi ý dáng **sắp theo điểm viral** (lọc được theo địa điểm / 1 người / cặp đôi).
+
+**Từ khoá tìm kiếm** (thêm 情侣 vào để tìm dáng cặp đôi, thêm 冬天 để tìm ảnh mùa đông):
+- Chung: 成都拍照姿势 · 重庆拍照姿势 · 成都拍照机位 · 重庆拍照机位 · 情侣拍照姿势
+- Trùng Khánh: 洪崖洞拍照 · 李子坝轻轨拍照 · 解放碑拍照 · 长江索道拍照 · 磁器口拍照 · 十八梯拍照 · 鹅岭二厂拍照 · 魁星楼拍照 · 来福士拍照
+- Thành Đô: 宽窄巷子拍照 · 锦里拍照 · 太古里拍照 · 文殊院拍照 · 熊猫基地拍照 · 安顺廊桥拍照 · 人民公园拍照
+- TikTok/Instagram: `chongqing photo spots` · `chengdu photo ideas` · #hongyadong · #chongqing · #chengdu · #kuanzhaixiangzi
+
+Khối lượng: ~15 địa điểm × 10–20 dáng ≈ 150–300 ảnh, khoảng 2–3 buổi lướt.
 
 ### 0.3 Danh sách địa điểm soạn sẵn (thay cho tính năng GPS)
 **Thành Đô:** Khoan Trách hạng tử (宽窄巷子), Cẩm Lý (锦里), Vũ Hầu Từ (武侯祠), Xuân Hy Lộ/Thái Cổ Lý (春熙路/太古里) + gấu trúc leo tòa IFS, Văn Thù Viện (文殊院), Cơ sở gấu trúc (熊猫基地), cầu An Thuận về đêm (安顺廊桥), Nhân Dân Công Viên quán trà (人民公园), Đô Giang Yển / Thanh Thành Sơn.
@@ -204,9 +233,11 @@ Model: mặc định `claude-opus-5-5`. Có thể đổi sang `claude-haiku-5-5`
 ## 5. Data model (IndexedDB)
 
 ```ts
-Pose      { id, source: 'import'|'unsplash'|'pexels', imageThumb: Blob, outlineSvg: string,
-            landmarks: number[33][3], people: number, tags: string[], favorite: boolean,
-            credit?: string, createdAt }
+Pose      { id, platform: 'xiaohongshu'|'douyin'|'tiktok'|'instagram'|'unsplash'|'other',
+            imageThumb: Blob, outlineSvg: string, landmarks: number[people][33][3], people: number,
+            tags: string[], destinationId?, favorite: boolean,
+            engagement?: { likes, saves, comments, shares }, postedAt?, viralScore?: number,
+            caption?, author?, createdAt }
 Trip      { id, name, startDate, destinations: Destination[] }
 Destination { id, tripId, name, lat?, lng?, sceneAnalysis?: SceneJSON, poseIds: string[] }
 Shot      { id, poseId?, destinationId?, photo: Blob, matchScore?, takenAt }
