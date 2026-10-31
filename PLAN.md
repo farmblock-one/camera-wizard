@@ -6,6 +6,52 @@
 
 ---
 
+## 0. Bối cảnh chuyến đi đầu tiên (ưu tiên cao nhất, ghi đè các mục bên dưới nếu mâu thuẫn)
+
+- **Máy:** iPhone. **Người chụp:** người đi cùng. **Kiểu ảnh:** 1 người + cặp đôi.
+- **Điểm đến:** Thành Đô & Trùng Khánh (Trung Quốc), tháng 11–12.
+
+### 0.1 Đi Trung Quốc ảnh hưởng gì
+| Vấn đề | Hệ quả | Cách xử lý |
+|---|---|---|
+| Tường lửa (GFW) | Mạng Trung Quốc (Wi-Fi khách sạn, SIM nội địa) **không vào được** Claude API, Google (MediaPipe model mặc định tải từ `storage.googleapis.com`), và có thể chặn `*.pages.dev` | **Offline-first bắt buộc**: mọi thứ tải sẵn ở Việt Nam trước khi bay |
+| Model MediaPipe tải từ CDN Google | Không tải được ở TQ | Tự host file `.wasm` + `.task` cùng app, precache bằng service worker |
+| Font/CDN bên ngoài | Lỗi/treo | Không dùng Google Fonts / CDN; bundle tất cả |
+| iOS xoá cache web | Mất dữ liệu | **Bắt buộc "Add to Home Screen"**; app cài trên màn hình chính không bị iOS xoá storage sau 7 ngày |
+| eSIM roaming quốc tế | Dữ liệu đi qua gateway nước ngoài nên thường vẫn gọi được API | Coi là “có thì tốt”, app không phụ thuộc |
+
+→ Phân tích cảnh bằng AI chuyển sang làm **trước chuyến đi**: cho AI phân tích ảnh tham khảo của từng địa điểm, rồi lưu sẵn kết quả + dáng vào máy.
+
+### 0.2 Nguồn dáng tốt nhất cho Thành Đô/Trùng Khánh: Xiaohongshu (小红书)
+- Ảnh "打卡" (check-in) tại đúng các điểm này nhiều hơn Unsplash rất nhiều.
+- Luồng: chụp màn hình bài 小红书 → import vào app → **công cụ crop** (bỏ UI/chữ) → tách viền tự động.
+- Unsplash/Pexels hạ xuống nguồn phụ.
+
+### 0.3 Danh sách địa điểm soạn sẵn (thay cho tính năng GPS)
+**Thành Đô:** Khoan Trách hạng tử (宽窄巷子), Cẩm Lý (锦里), Vũ Hầu Từ (武侯祠), Xuân Hy Lộ/Thái Cổ Lý (春熙路/太古里) + gấu trúc leo tòa IFS, Văn Thù Viện (文殊院), Cơ sở gấu trúc (熊猫基地), cầu An Thuận về đêm (安顺廊桥), Nhân Dân Công Viên quán trà (人民公园), Đô Giang Yển / Thanh Thành Sơn.
+**Trùng Khánh:** Hồng Nhai Động về đêm (洪崖洞), ga monorail xuyên nhà Lý Tử Bá (李子坝), Giải Phóng Bi (解放碑), cáp treo sông Trường Giang (长江索道), Từ Khí Khẩu (磁器口), Thập Bát Thê (十八梯), công viên Nga Lĩnh / Nhị Hán (鹅岭二厂), Khôi Tinh Lâu (魁星楼), Triều Thiên Môn / Lai Phúc Sĩ (朝天门/来福士).
+
+Mỗi địa điểm: ~10–20 dáng (1 người + cặp đôi), mẹo góc máy, giờ đẹp. Đi tháng 11–12 thường trời âm u/sương, ánh sáng dịu, mặc áo khoác.
+
+### 0.4 iPhone + ảnh đêm: điểm quyết định PWA hay native
+- Camera qua web trên iPhone **không có Night mode, Smart HDR, Deep Fusion**. Trùng Khánh nổi tiếng chụp đêm (Hồng Nhai Động, đèn neon), nên đây là rủi ro lớn nhất.
+- Giai đoạn 0 sẽ chụp thử ban ngày **và** ban đêm trên chính iPhone của bạn, so với camera gốc.
+- Nếu không đạt thì làm app native iOS (Expo + `react-native-vision-camera`, giữ lại logic TypeScript). Cần một trong hai:
+  - Có máy Mac (Xcode, dùng Apple ID miễn phí, nhưng **phải ký lại app mỗi 7 ngày**, bất tiện nếu chuyến đi dài hơn 7 ngày), hoặc
+  - Apple Developer $99/năm (cài qua TestFlight, không cần Mac nếu build bằng EAS).
+- Phương án dự phòng khi vẫn dùng PWA: chế độ "Xem mẫu" (người chụp xem dáng + viền, rồi chụp đêm bằng camera gốc).
+
+### 0.5 Thứ tự ưu tiên mới cho chuyến này
+1. **Giai đoạn 0:** spike chụp thử ngày/đêm trên iPhone, chốt PWA hay native.
+2. **Overlay + chế độ người chụp hộ** (người đi cùng là người cầm máy): viền to, mẹo góc máy 1 dòng, nút chụp to.
+3. **Thư viện + import từ 小红书** (crop, tag `1 người` / `cặp đôi`, tag theo địa điểm).
+4. **Chế độ chuyến đi Thành Đô – Trùng Khánh, offline hoàn toàn** (danh sách địa điểm ở 0.3).
+5. **Cặp đôi:** viền 2 người; khi cả hai cùng vào hình thì đặt tripod + hẹn giờ + tự chụp khi cả 2 khớp dáng (`numPoses: 2`).
+6. **AI phân tích cảnh:** chạy ở nhà trước chuyến đi; tại chỗ chỉ dùng khi có eSIM roaming.
+- Hoãn: tìm địa danh qua GPS/Overpass, Unsplash/Pexels.
+
+---
+
 ## 1. SnapPose làm gì (để biết mình cần clone cái gì)
 
 | Tính năng SnapPose | Mô tả |
@@ -209,8 +255,10 @@ camera-wizard/
 
 ## 10. Cần bạn chốt trước khi code
 
-1. Bạn dùng **iPhone hay Android**? (ảnh hưởng lớn nhất tới chuyện PWA hay native)
-2. Ai sẽ chụp: người đi cùng, tự chụp bằng tripod, hay nhờ người lạ? (quyết định ưu tiên tự chụp hay chế độ người chụp hộ)
-3. **Khi nào đi, đi đâu?** (để biết cần cắt gọn tới giai đoạn nào và chuẩn bị dáng cho điểm đến)
-4. Chụp chủ yếu 1 người hay cặp đôi/nhóm?
-5. OK với chi phí Claude API khoảng vài USD mỗi chuyến không?
+Đã chốt: iPhone · người đi cùng chụp · Thành Đô & Trùng Khánh tháng 11–12 · 1 người + cặp đôi.
+
+Còn lại:
+1. **Ngày bay cụ thể?** Từ đó cắt scope: < 2 tuần thì chỉ làm mục 1–4 ở 0.5.
+2. Có **máy Mac** không? Có sẵn sàng trả **$99 Apple Developer** nếu phải làm native không?
+3. Có mua **eSIM roaming** quốc tế không? (quyết định có dùng AI tại chỗ được hay không)
+4. OK với chi phí Claude API khoảng vài USD (phân tích trước chuyến) không?
